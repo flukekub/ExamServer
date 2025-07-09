@@ -4,8 +4,13 @@ const examSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
+        unique: true,
     },
-    imageUrl: {
+    imageData: {
+        type: Buffer,
+        required: true,
+    },
+    imageType: {
         type: String,
         required: true,
     },
@@ -19,10 +24,21 @@ const examSchema = new mongoose.Schema({
     },
     type:{
         type: String,
-        enum: ["set", "logic","realNumber","relationAndFunction","exponentialAndLogarithms","trigon","complexNumber","matrices","sequenceAndSeries","AnalyticGeometryAndConicSections","vector","calculus","statistic","counting","probability","probabilityDistributions"],
         required: true,
     },
     difficulty:{
+        type: String,
+        required: true,
+    },
+    choices:{
+        type: Number,
+        required: true,
+    },
+    answerImageData: {
+        type: Buffer,
+        required: true,
+    },
+    answerImageType: {
         type: String,
         required: true,
     },

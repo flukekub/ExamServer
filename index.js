@@ -14,6 +14,7 @@ import authRoutes from './routes/auth.js';
 import scoreRoutes from './routes/scores.js';
 import subjectRoutes from './routes/subject.js';
 
+
 const app = express();
 app.use(cors());
 app.use(express.json());
