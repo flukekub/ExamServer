@@ -26,7 +26,9 @@ app.use('/api/v1/scores', scoreRoutes);
 app.use('/api/v1/subjects', subjectRoutes);
 
 
-const port = process.env.PORT || 5000;
-app.listen(port, () => {
-    console.log(`Server is running in ${process.env.NODE_ENV} on ${process.env.HOST}:${process.env.PORT}`);
-});
+// const port = process.env.PORT || 5000;
+// app.listen(port, () => {
+//     console.log(`Server is running in ${process.env.NODE_ENV} on ${process.env.HOST}:${process.env.PORT}`);
+// });
+
+export default app;  // ✅ export default สำหรับ Vercel
