@@ -1,3 +1,4 @@
+import { get } from "mongoose";
 import Exam from "../models/Exam.js";
 
 export const getExams = async (req, res, next) => {
@@ -48,16 +49,37 @@ export const getExams = async (req, res, next) => {
 
 export const getExam = async (req, res, next) => {
   try {
-    const exam = await Exam.findById(req.params.id);
+    const { id, type } = req.params;
+
+    // ดึงข้อมูล exam ปัจจุบัน
+    const exam = await Exam.findById(id);
     if (!exam) {
       return res.status(404).json({
         success: false,
         message: "Exam not found",
       });
     }
+
+    // ดึงข้อมูล exam ตัวก่อนหน้า
+    const previousExam = await Exam.findOne({ type, _id: { $lt: id } })
+      .sort({
+        _id: -1,
+      })
+      .skip(1) // ข้ามเอกสารแรก
+      .limit(1);
+
+    // ดึงข้อมูล exam ตัวถัดไป
+    const nextExam = await Exam.findOne({ type, _id: { $gt: id } }).sort({
+      _id: 1,
+    });
+
     res.status(200).json({
       success: true,
-      data: exam,
+      data: {
+        currentExam: exam,
+        previousExamId: previousExam ? previousExam._id : null,
+        nextExamId: nextExam ? nextExam._id : null,
+      },
     });
   } catch (err) {
     res.status(500).json({
@@ -96,6 +118,7 @@ export const getExamsBytype = async (req, res, next) => {
     }
 
     // Pagination result
+    const totalPages = Math.ceil(total / limit);
     const pagination = {};
 
     if (endIndex < total) {
@@ -116,6 +139,7 @@ export const getExamsBytype = async (req, res, next) => {
       success: true,
       count: exams.length,
       total,
+      totalPages,
       pagination,
       data: exams,
     });
