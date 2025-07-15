@@ -47,9 +47,5 @@ const examSchema = new mongoose.Schema({
         default: Date.now,
     },
 })
-examSchema.index({ subject: 1, type: 1 });
-
-// Separate index for queries filtering by type alone
-examSchema.index({ type: 1 });
 
 export default mongoose.model("Exam", examSchema);

@@ -255,23 +255,17 @@ export const deleteExam = async (req, res, next) => {
 
 export const getAllTypeExams = async (req, res, next) => {
   try {
-    const types = await Exam.aggregate([
-      { $match: { subject: req.params.subject } }, // Filter by subject
-      { $group: { _id: "$type" } }, // Group by type
-      { $project: { _id: 0, type: "$_id" } }, // Format the output
-    ]);
-
+    const types = await Exam.distinct("type", { subject: req.params.subject });
     if (!types || types.length === 0) {
       return res.status(404).json({
         success: false,
         message: "No exam types found for this subject",
       });
     }
-
     res.status(200).json({
       success: true,
       count: types.length,
-      data: types.map((t) => t.type), // Extract type values
+      data: types,
     });
   } catch (err) {
     res.status(500).json({
