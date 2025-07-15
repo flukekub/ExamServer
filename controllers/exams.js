@@ -101,14 +101,18 @@ export const getExamsBytype = async (req, res, next) => {
   try {
     // Pagination
     const page = parseInt(req.query.page, 10) || 1;
-    const limit = parseInt(req.query.limit, 10) || 25;
-    const startIndex = (page - 1) * limit;
-    const endIndex = page * limit;
+    const limit = req.query.limit ? parseInt(req.query.limit, 10) : null; // ตรวจสอบ limit
+    const startIndex = (page - 1) * (limit || 0); // ถ้าไม่มี limit, startIndex จะเป็น 0
     const total = await Exam.countDocuments({ type: req.params.type });
 
-    const exams = await Exam.find({ type: req.params.type })
-      .skip(startIndex)
-      .limit(limit);
+    let examsQuery = Exam.find({ type: req.params.type });
+
+    // Apply pagination only if limit is provided
+    if (limit) {
+      examsQuery = examsQuery.skip(startIndex).limit(limit);
+    }
+
+    const exams = await examsQuery;
 
     if (!exams || exams.length === 0) {
       return res.status(404).json({
@@ -118,17 +122,17 @@ export const getExamsBytype = async (req, res, next) => {
     }
 
     // Pagination result
-    const totalPages = Math.ceil(total / limit);
+    const totalPages = limit ? Math.ceil(total / limit) : 1; // ถ้าไม่มี limit, totalPages จะเป็น 1
     const pagination = {};
 
-    if (endIndex < total) {
+    if (limit && startIndex + limit < total) {
       pagination.next = {
         page: page + 1,
         limit,
       };
     }
 
-    if (startIndex > 0) {
+    if (limit && startIndex > 0) {
       pagination.prev = {
         page: page - 1,
         limit,
@@ -140,7 +144,7 @@ export const getExamsBytype = async (req, res, next) => {
       count: exams.length,
       total,
       totalPages,
-      pagination,
+      pagination: limit ? pagination : null, // ถ้าไม่มี limit, pagination จะเป็น null
       data: exams,
     });
   } catch (err) {

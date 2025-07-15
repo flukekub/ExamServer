@@ -27,8 +27,8 @@ router.route("/subject/:subject").get(getAllTypeExams);
 router
   .route("/id/:type/:id")
   .get(getExam)
-  .delete(protect, deleteExam)
-  .put(protect, updateExam);
 router.route("/type/:type").get(getExamsBytype);
+
+router.route("/id/:id").delete(protect, deleteExam).put(protect, updateExam);
 
 export default router;
